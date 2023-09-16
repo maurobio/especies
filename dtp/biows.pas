@@ -326,7 +326,7 @@ begin
   inherited Destroy;
 end;
 
-(*function TWikiSearch.Snippet(const searchStr: string): string;
+function TWikiSearch.Snippet(const searchStr: string): string;
 var
   JsonData: TJsonData;
   Client: TFPHttpClient;
@@ -346,9 +346,9 @@ begin
     JsonData.Free;
     Client.Free;
   end;
-end;*)
+end;
 
-function TWikiSearch.Snippet(const searchStr: string): string;
+(*function TWikiSearch.Snippet(const searchStr: string): string;
 var
   JsonData: TJsonData;
   queryStr: string;
@@ -374,9 +374,9 @@ begin
     JsonData.Free;
     Client.Free;
   end;
-end;
+end;*)
 
-(*{ Search images from Wikimedia Commons }
+{ Search images from Wikimedia Commons }
 function TWikiSearch.Images(const searchStr: string; limit: integer = 10): TStringList;
 var
   JsonData, JsonItem, JsonItems: TJsonData;
@@ -412,9 +412,9 @@ begin
     JsonData.Free;
     Client.Free;
   end;
-end; *)
+end;
 
-function TWikiSearch.Images(const searchStr: string; limit: integer = 10): TStringList;
+(*function TWikiSearch.Images(const searchStr: string; limit: integer = 10): TStringList;
 var
   JsonData, JsonItem, JsonItems: TJsonData;
   i, Count: integer;
@@ -454,7 +454,7 @@ begin
     JsonData.Free;
     Client.Free;
   end;
-end;
+end;*)
 
 { TFFSearch methods }
 

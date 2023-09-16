@@ -32,6 +32,8 @@
 {                                Wikipedia                                      }
 {    Version 1.05, 17th Aug 23 - Changed the code for retrieving data from      }
 {                                FiveFilters and NCBI                           }
+{    Version 1.06, 14th Sep 23 - Fixed access violation errors when handling    }
+{                                Wikipedia redirections                         }
 {===============================================================================}
 
 unit main;
@@ -204,6 +206,7 @@ var
   urlWiki, tagWord, tagHTML, refUrl, imgUrl, taxUrl, urlId, UrlNuc,
   urlProt, itemStr, baseMapUrl, pointsUrl: string;
   targetDir: string;
+  s: string;
   key, taxId, nucNum, protNum: integer;
   i, nrecs: integer;
   linkOut, linkIn, imgs, tags, pubs: TStringList;
@@ -261,21 +264,26 @@ begin
   snippet := WikiSearch.Snippet(queryStr);
   Application.ProcessMessages;
   StatusBar.SimpleText := 'Building keyword list...';
-  FFSearch := TFFSearch.Create;
-  tags := FFSearch.termExtract(snippet, 10);
-  tagHTML := '';
-  Results.Add('<h3>Text tags</h3>');
-  for i := 0 to tags.Count - 1 do
+  if Length(snippet) = 0 then
+    Results.Add('No text tags')
+  else
   begin
-    tagWord := tags[i];
-    tagWord := StringReplace(tagWord, ' ', '&nbsp;', [rfReplaceAll]);
-    if Length(tagWord) > 0 then
-      tagHTML := tagHTML +
-        '<span style=''display:inline;border:1px solid blue;padding:1px;margin:2px;line-height:22px;background-color:rgb(181,213,255);''>'
-        + tagWord + ' ' + '</span>';
+    FFSearch := TFFSearch.Create;
+    tags := FFSearch.termExtract(snippet, 10);
+    tagHTML := '';
+    Results.Add('<h3>Text tags</h3>');
+    for i := 0 to tags.Count - 1 do
+    begin
+      tagWord := tags[i];
+      tagWord := StringReplace(tagWord, ' ', '&nbsp;', [rfReplaceAll]);
+      if Length(tagWord) > 0 then
+        tagHTML := tagHTML +
+          '<span style=''display:inline;border:1px solid blue;padding:1px;margin:2px;line-height:22px;background-color:rgb(181,213,255);''>'
+          + tagWord + ' ' + '</span>';
+    end;
+    Results.Add(tagHTML);
+    FFSearch.Destroy;
   end;
-  Results.Add(tagHTML);
-  FFSearch.Destroy;
 
   urlWiki := 'http://en.wikipedia.org/wiki/' +
     StringReplace(queryStr, ' ', '_', [rfReplaceAll]);
@@ -351,9 +359,8 @@ begin
     DeleteFile(targetDir + 'points.png');
     taxUrl := '<a href=http://gbif.org/species/' + IntToStr(key) + '>';
     Results.Add('<p>' + taxUrl + IntToStr(nrecs) + ' record(s)</a></p>');
-    Results.Add(taxUrl +
-      '<img src="./pictures/' + IntToStr(key) + '.png"' +
-      ' height="56%" width="56%" border=1/></a>');
+    Results.Add(taxUrl + '<img src="./pictures/' + IntToStr(key) +
+      '.png"' + ' height="56%" width="56%" border=1/></a>');
   end;
 
   Application.ProcessMessages;
